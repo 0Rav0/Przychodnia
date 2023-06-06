@@ -61,6 +61,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 class DoctorSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
+    working_days = serializers.SlugRelatedField(many=True, read_only=True, slug_field='day'  )
+    working_hours = serializers.SlugRelatedField(many=True, read_only=True, slug_field='time' )
 
     class Meta:
         model = Doctor
@@ -74,10 +76,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
     reason = serializers.CharField(read_only=True)
     date = serializers.DateField(read_only=True)
     time = serializers.TimeField(read_only=True)
+    room = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason', 'prescription')
+        fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room')
 
     def update(self, instance, validated_data):
         instance.status = True

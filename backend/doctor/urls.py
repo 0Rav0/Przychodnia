@@ -14,6 +14,7 @@ appointment_detail = AppointementViewSet.as_view({
 
 urlpatterns = [
     path('list', doctor_list, name='doctor-list'),
+    path('<int:pk>', doctor_detail, name='doctor-detail'),
     path('profile', doctor_profile, name='doctor-profile'),
     path('appointments',appointment_list, name='appointment-list'),
     path('appointments/<int:pk>', appointment_detail, name='appointment-detail'),

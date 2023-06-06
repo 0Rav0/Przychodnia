@@ -22,6 +22,13 @@ def doctor_list(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+def doctor_detail(request, pk):
+    doctor = Doctor.objects.get(pk=pk)
+    serializer = DoctorSerializer(doctor, many=False)
+    return Response(serializer.data)
+
+
 @api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsDoctor])
 def doctor_profile(request, format=None):

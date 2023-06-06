@@ -103,7 +103,7 @@ class AppointementViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         patient = Patient.objects.get(user=self.request.user)
-        serializer.save(patient=patient)  
+        serializer.save(patient=patient, room=patient.id)  
 
 
 @api_view(['GET'])
@@ -114,6 +114,30 @@ def appointment_status(request, status):
 
     appointment = Appointment.objects.filter(patient=patient, status=status)
     appointmentSerializer = AppointmentSerializer(appointment, many=True)
+
+    return Response(appointmentSerializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsPatient])
+def prescription_list(request):
+    user = request.user
+    patient = Patient.objects.get(user=user)
+
+    appointment = Appointment.objects.filter(patient=patient)
+    appointmentSerializer = PrescriptionSerializer(appointment, many=True)
+
+    return Response(appointmentSerializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsPatient])
+def prescription_detail(request, pk):
+    user = request.user
+    patient = Patient.objects.get(user=user)
+
+    appointment = Appointment.objects.get(pk=pk, patient=patient)
+    appointmentSerializer = PrescriptionSerializer(appointment)
 
     return Response(appointmentSerializer.data)
 

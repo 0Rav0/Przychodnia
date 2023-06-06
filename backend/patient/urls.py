@@ -21,4 +21,6 @@ urlpatterns = [
     path('patient/appointments', appointment_list, name='patient-appointment'),
     path('patient/appointments/<int:pk>', appointment_detail, name='patient-appointment-detail'),
     path('patient/appointments/<status>', appointment_status, name='patient-appointment-status'),
+    path('patient/prescriptions', prescription_list, name='prescription-list'),
+    path('patient/prescriptions/<int:pk>', prescription_detail, name='prescription-detail'),
 ]

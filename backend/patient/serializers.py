@@ -78,48 +78,26 @@ class PatientSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     patient = serializers.StringRelatedField()
-    # doctor = serializers.StringRelatedField()
     doctor = serializers.PrimaryKeyRelatedField(many=False, queryset=Doctor.objects.all())
-    
-    prescription = serializers.CharField(read_only=True)
+    room = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason', 'prescription')
+        fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason','room')
 
 
 class AppointmentListSerializer(serializers.ModelSerializer):
-    # patient = serializers.StringRelatedField()
-    doctor = serializers.StringRelatedField()
-    
+    # doctor = serializers.StringRelatedField()
+
     prescription = serializers.CharField(read_only=True)
+    recommendations = serializers.CharField(read_only=True)
+    room = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date','time', 'doctor', 'status', 'reason', 'prescription')
+        fields = ( 'id', 'date','time', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room')
     
 
-# class PatientCreateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Patient
-#         fields = 
-    # first_name = serializers.CharField(required=False)
-    # last_name = serializers.CharField(required=False)
-    # pesel = serializers.CharField(required=False)
-    # phone = serializers.CharField(required=False)
-
-
-    # def validate_phone(self, phone):
-    #     if phone.isdigit()==False:
-    #         raise serializers.ValidationError('Please Enter a valid phone number!')
-    #     return phone
-    
-    # def create(self, validated_data):
-    #     new_patient = Patient.objects.create(user = validated_data['user'])
-    #     return new_patient
-    
-    # def update(self, instance, validated_data):
-    #     # instance.phone=validated_data.get('phone', instance.phone)
-    #     instance.save()
-
-    #     return instance
+class PrescriptionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    prescription = serializers.CharField()

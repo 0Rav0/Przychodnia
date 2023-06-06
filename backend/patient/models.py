@@ -23,13 +23,15 @@ class Appointment(models.Model):
     time = models.TimeField()
     reason = models.TextField()
     prescription = models.TextField(blank=True)
+    recommendations = models.TextField(blank=True)
     status = models.BooleanField(default=False)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    room = models.IntegerField(default=0)
 
     @property
     def patient_name(self):
         self.patient.get_name
     
     def __str__(self):
-        return self.patient.get_name+'-'+self.doctor.get_name + " " + str(self.date)
+        return self.patient.get_name+'-> dr.'+self.doctor.get_name + " " + str(self.date)
