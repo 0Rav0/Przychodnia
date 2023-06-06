@@ -155,9 +155,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'account.User'
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST_USER = 'testemail@gmail.com'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = '1025'
+# EMAIL_HOST_USER = 'testemail@gmail.com'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = '1025'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

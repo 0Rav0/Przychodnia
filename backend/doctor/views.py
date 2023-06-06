@@ -3,18 +3,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from doctor.models import Doctor
 from patient.models import Appointment, Patient
-
-from .serializers import (
-    UserCreateSerializer,
-    UserSerializer, 
-    DoctorSerializer, 
-    AppointmentSerializer,
-    PatientAppointmentSerializer
-)
-
 from patient.serializers import PatientProfileSerializer
+
+from .models import Doctor
+from .serializers import *
 
 
 class IsDoctor(BasePermission):
@@ -80,13 +73,11 @@ class AppointementViewSet(viewsets.ModelViewSet):
 @permission_classes([IsDoctor])
 def get_appointment_patient_detail(request, pk):
     user = request.user
-
     doctor = Doctor.objects.get(user=user)
 
     appointment = Appointment.objects.get(pk=pk)
 
     patient = appointment.patient
-
     patient_data = Patient.objects.get(pk=patient.id)
     patient_appointments = Appointment.objects.filter(patient=patient, doctor=doctor)
 

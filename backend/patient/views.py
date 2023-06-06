@@ -11,8 +11,8 @@ import jwt
 
 from account.utils import Util
 from account.models import User
-from .models import Patient, Appointment
 
+from .models import Patient, Appointment
 from .serializers import *
 
 class IsPatient(BasePermission):
@@ -35,20 +35,20 @@ def register_patient(request, format=None):
         if patientSerializer.is_valid():
             patientSerializer.save(user=user)
 
-            token = RefreshToken.for_user(user).access_token
+            # token = RefreshToken.for_user(user).access_token
 
-            current_site=get_current_site(request).domain
-            relativeLink = reverse('email_verify')
-            absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-            email_body = 'Hi '+user.email+' Use link below to verify your email \n'+absurl
+            # current_site=get_current_site(request).domain
+            # relativeLink = reverse('email_verify')
+            # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
+            # email_body = 'Hi '+user.email+' Use link below to verify your email \n'+absurl
 
-            data={
-                'email_body':email_body, 
-                'to_email': user.email,
-                'email_subject':'Verify your email'}
-            Util.send_email(data)
+            # data={
+            #     'email_body':email_body, 
+            #     'to_email': user.email,
+            #     'email_subject':'Verify your email'}
+            # Util.send_email(data)
 
-            return Response({'message': "account created, check your email"}, status=status.HTTP_201_CREATED)
+            return Response({'message': "account created"}, status=status.HTTP_201_CREATED)
         return Response({'message': patientSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'message': userSerializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
 
@@ -110,7 +110,6 @@ class AppointementViewSet(viewsets.ModelViewSet):
 @permission_classes([IsPatient])
 def appointment_status(request, status):
     user = request.user
-
     patient = Patient.objects.get(user=user)
 
     appointment = Appointment.objects.filter(patient=patient, status=status)

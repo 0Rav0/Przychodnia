@@ -33,7 +33,7 @@ class User(AbstractUser):
     last_name = None
     last_login = models.DateTimeField(auto_now=True)
     email = models.EmailField(unique=True)
-    is_active = models.BooleanField(default=False)
+    # is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
