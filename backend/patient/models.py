@@ -17,12 +17,6 @@ class Patient(models.Model):
     def __str__(self):
         return self.first_name+" "+self.last_name
 
-# TIME_CHOICES = [
-#     ("9:00", "9:00:00"),
-#     ("9:30", "9:30:00"),
-#     ("10:00", "10:00:00"),
-#     ("10:30", "10:30:00")
-# ]
 
 class Appointment(models.Model):
     date = models.DateField()
@@ -30,7 +24,7 @@ class Appointment(models.Model):
     reason = models.TextField()
     prescription = models.TextField(blank=True)
     recommendations = models.TextField(blank=True)
-    status = models.BooleanField(default=False)
+    status = models.IntegerField(default=0)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     room = models.IntegerField(default=0)
@@ -40,4 +34,4 @@ class Appointment(models.Model):
         self.patient.get_name
     
     def __str__(self):
-        return self.patient.get_name+'-> dr.'+self.doctor.get_name + " " + str(self.date)
+        return "WIZYTA pacjanta: "+self.patient.get_name+' u dr.'+self.doctor.get_name + " dnia " + str(self.date)

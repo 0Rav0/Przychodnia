@@ -83,7 +83,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room')
 
     def update(self, instance, validated_data):
-        instance.status = True
+        instance.status = 2
         return super().update(instance, validated_data)
 
 

@@ -29,7 +29,12 @@ def login(request):
 
 
     token = TokenObtainPairSerializer.get_token(user)
-    group = user.groups.all().first().name    
+    
+    try:
+        group = user.groups.all().first().name    
+    except:
+        group = None
+
     response = Response(
         {
             "refresh": str(token),

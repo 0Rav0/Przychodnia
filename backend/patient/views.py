@@ -205,7 +205,7 @@ def prescription_list(request):
     user = request.user
     patient = Patient.objects.get(user=user)
 
-    appointment = Appointment.objects.filter(patient=patient)
+    appointment = Appointment.objects.filter(patient=patient, status=2)
     appointmentSerializer = PrescriptionSerializer(appointment, many=True)
 
     return Response(appointmentSerializer.data)
@@ -217,7 +217,7 @@ def prescription_detail(request, pk):
     user = request.user
     patient = Patient.objects.get(user=user)
 
-    appointment = Appointment.objects.get(pk=pk, patient=patient)
+    appointment = Appointment.objects.get(pk=pk, patient=patient, status=2)
     appointmentSerializer = PrescriptionSerializer(appointment)
 
     return Response(appointmentSerializer.data)
