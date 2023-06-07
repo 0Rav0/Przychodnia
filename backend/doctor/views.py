@@ -24,7 +24,11 @@ def doctor_list(request):
 
 @api_view(['GET'])
 def doctor_detail(request, pk):
-    doctor = Doctor.objects.get(user=pk)
+    try:
+        doctor = Doctor.objects.get(id=pk)
+    except:
+        return Response({"message":"No doctor with given id"})
+        
     serializer = DoctorDetailSerializer(doctor, many=False)
     return Response(serializer.data)
 
