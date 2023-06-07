@@ -60,13 +60,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class DoctorSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    # user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Doctor
+        fields = ('user', 'first_name', 'last_name', 'specialization',)
+
+
+class DoctorDetailSerializer(serializers.ModelSerializer):
+    # user = serializers.StringRelatedField()
     working_days = serializers.SlugRelatedField(many=True, read_only=True, slug_field='day'  )
     working_hours = serializers.SlugRelatedField(many=True, read_only=True, slug_field='time' )
 
     class Meta:
         model = Doctor
-        fields = '__all__'
+        exclude = ('id',)
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -80,7 +88,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room')
+        fields = ( 'id', 'date', 'time', 'patient', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room')
 
     def update(self, instance, validated_data):
         instance.status = 2
@@ -88,6 +96,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
 
 class PatientAppointmentSerializer(serializers.ModelSerializer):
+    reason = serializers.CharField(read_only=True)
+    date = serializers.DateField(read_only=True)
+    time = serializers.TimeField(read_only=True)
+    room = serializers.IntegerField(read_only=True)
+    
     class Meta:
         model = Appointment
-        fields = ( 'id','date', 'time', 'status', 'reason', 'prescription')
+        fields = ( 'id','date', 'time', 'status', 'reason', 'prescription', 'recommendations')

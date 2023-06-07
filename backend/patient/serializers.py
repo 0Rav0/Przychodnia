@@ -65,37 +65,42 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class PatientProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
-        fields = ('first_name', 'last_name', 'pesel', 'phone_number')
+        fields = ('first_name', 'last_name', 'pesel', 'phone_number',)
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    # user = serializers.StringRelatedField()
 
     class Meta:
         model = Patient
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('id',)
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
     patient = serializers.StringRelatedField()
     doctor = serializers.PrimaryKeyRelatedField(many=False, queryset=Doctor.objects.all())
-    room = serializers.IntegerField(read_only=True)
+    # room = serializers.IntegerField(read_only=True)
+
+    date = serializers.DateField(format="%d-%m-%Y")
 
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date','time', 'patient', 'doctor', 'status', 'reason','room')
+        fields = ( 'id', 'date', 'time', 'patient', 'doctor', 'status', 'reason',)
 
 
-class AppointmentListSerializer(serializers.ModelSerializer):
+class AppointmentDetailSerializer(serializers.ModelSerializer):
     # doctor = serializers.StringRelatedField()
 
     prescription = serializers.CharField(read_only=True)
     recommendations = serializers.CharField(read_only=True)
     room = serializers.IntegerField(read_only=True)
 
+    date = serializers.DateField(format="%d-%m-%Y")
+
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date','time', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room')
+        fields = ('id','date','time', 'patient', 'doctor', 'status', 'reason', 'prescription', 'recommendations', 'room',)
     
 
 class PrescriptionSerializer(serializers.Serializer):

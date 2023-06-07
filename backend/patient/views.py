@@ -68,8 +68,10 @@ def patient_profile(request, format=None):
     if request.method == 'GET':
         user = request.user
         profile = Patient.objects.get(user=user)
+
         userSerializer=UserSerializer(user)
         profileSerializer = PatientProfileSerializer(profile)
+
         return Response({
             'user_data':userSerializer.data,
             'profile_data':profileSerializer.data
@@ -115,11 +117,11 @@ def get_free_time(request, date, doctor):
 @api_view(['GET', 'POST'])
 @permission_classes([IsPatient])
 def appointment_list(request):
-    patient = Patient.objects.get(pk=request.user.id)
+    patient = Patient.objects.get(user=request.user)
 
     if request.method == 'GET':
         appointment = Appointment.objects.filter(patient=patient)
-        serializer = AppointmentListSerializer(appointment, many=True)
+        serializer = AppointmentDetailSerializer(appointment, many=True)
         return Response(serializer.data)
     
     elif request.method == 'POST':
@@ -141,7 +143,7 @@ def appointment_detail(request, pk, format=None):
         return Response(status=status.HTTP_404_NOT_FOUND)
   
     if request.method == 'GET':
-        serializer = AppointmentListSerializer(appointment)
+        serializer = AppointmentDetailSerializer(appointment)
         return Response(serializer.data)
 
 
@@ -167,33 +169,13 @@ def appointment_detail(request, pk, format=None):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
-# class AppointementViewSet(viewsets.ModelViewSet):
-#     permission_classes = [IsPatient]
-    
-#     def get_serializer_class(self):
-#         if self.action == 'create' or self.action == 'partial_update' or self.action == 'update':
-#             return AppointmentSerializer
-#         else:
-#             return AppointmentListSerializer
-    
-#     def get_queryset(self):
-#         patient = Patient.objects.get(user=self.request.user)
-#         appointments = Appointment.objects.filter(patient=patient)
-#         return appointments   
-
-#     def perform_create(self, serializer):
-#         patient = Patient.objects.get(user=self.request.user)
-#         serializer.save(patient=patient, room=patient.id)  
-
-
 @api_view(['GET'])
 @permission_classes([IsPatient])
 def appointment_status(request, status):
     user = request.user
     patient = Patient.objects.get(user=user)
 
-    appointment = Appointment.objects.filter(patient=patient, status=status)
+    appointment = Appointment.objects.filter(patient=patient, status=int(status))
     appointmentSerializer = AppointmentSerializer(appointment, many=True)
 
     return Response(appointmentSerializer.data)
@@ -223,6 +205,9 @@ def prescription_detail(request, pk):
     return Response(appointmentSerializer.data)
 
 
+
+# --- email veryfication ---
+
 @api_view(['GET'])
 def email_verify(request):
     token = request.GET.get('token')
@@ -241,3 +226,23 @@ def email_verify(request):
         return Response({"message": "link expired"}, status=status.HTTP_400_BAD_REQUEST, )
     except jwt.exceptions.DecodeError as identifier:
         return Response({"message": str(identifier)}, status=status.HTTP_400_BAD_REQUEST, )
+
+
+
+# class AppointementViewSet(viewsets.ModelViewSet):
+#     permission_classes = [IsPatient]
+    
+#     def get_serializer_class(self):
+#         if self.action == 'create' or self.action == 'partial_update' or self.action == 'update':
+#             return AppointmentSerializer
+#         else:
+#             return AppointmentListSerializer
+    
+#     def get_queryset(self):
+#         patient = Patient.objects.get(user=self.request.user)
+#         appointments = Appointment.objects.filter(patient=patient)
+#         return appointments   
+
+#     def perform_create(self, serializer):
+#         patient = Patient.objects.get(user=self.request.user)
+#         serializer.save(patient=patient, room=patient.id)  

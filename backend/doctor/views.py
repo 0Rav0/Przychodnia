@@ -24,8 +24,8 @@ def doctor_list(request):
 
 @api_view(['GET'])
 def doctor_detail(request, pk):
-    doctor = Doctor.objects.get(pk=pk)
-    serializer = DoctorSerializer(doctor, many=False)
+    doctor = Doctor.objects.get(user=pk)
+    serializer = DoctorDetailSerializer(doctor, many=False)
     return Response(serializer.data)
 
 
@@ -85,7 +85,7 @@ def get_appointment_patient_detail(request, pk):
     appointment = Appointment.objects.get(pk=pk)
 
     patient = appointment.patient
-    patient_data = Patient.objects.get(pk=patient.id)
+    patient_data = Patient.objects.get(user=patient.id)
     patient_appointments = Appointment.objects.filter(patient=patient, doctor=doctor)
 
     patient_data_serializer = PatientProfileSerializer(patient_data)
