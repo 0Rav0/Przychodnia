@@ -17,6 +17,12 @@ class Patient(models.Model):
     def __str__(self):
         return self.first_name+" "+self.last_name
 
+# TIME_CHOICES = [
+#     ("9:00", "9:00:00"),
+#     ("9:30", "9:30:00"),
+#     ("10:00", "10:00:00"),
+#     ("10:30", "10:30:00")
+# ]
 
 class Appointment(models.Model):
     date = models.DateField()

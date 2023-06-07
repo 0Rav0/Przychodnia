@@ -2,16 +2,16 @@ from django.urls import path
 from .views import *
 
 
-appointment_list = AppointementViewSet.as_view({
-    'get': 'list',
-    'post': 'create'
-})
-appointment_detail = AppointementViewSet.as_view({
-    'get': 'retrieve',
-    'put': 'update',
-    'patch': 'partial_update',
-    'delete': 'destroy'
-})
+# appointment_list = AppointementViewSet.as_view({
+#     'get': 'list',
+#     'post': 'create'
+# })
+# appointment_detail = AppointementViewSet.as_view({
+#     'get': 'retrieve',
+#     'put': 'update',
+#     'patch': 'partial_update',
+#     'delete': 'destroy'
+# })
 
 
 urlpatterns = [
@@ -23,4 +23,5 @@ urlpatterns = [
     path('patient/appointments/<status>', appointment_status, name='patient-appointment-status'),
     path('patient/prescriptions', prescription_list, name='prescription-list'),
     path('patient/prescriptions/<int:pk>', prescription_detail, name='prescription-detail'),
+    path('free/<str:date>/<int:doctor>', get_free_time, name='get-free-time'),
 ]

@@ -101,3 +101,7 @@ class AppointmentListSerializer(serializers.ModelSerializer):
 class PrescriptionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     prescription = serializers.CharField()
+
+
+class FreeTimesSerializer(serializers.Serializer):
+    time = serializers.TimeField()

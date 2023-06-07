@@ -1,24 +1,30 @@
 from django.shortcuts import render
-from django.contrib.sites.shortcuts import get_current_site
+# from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.conf import settings
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-import jwt
+# from rest_framework_simplejwt.tokens import RefreshToken
+import json
+# import jwt
 
 from account.utils import Util
 from account.models import User
+from doctor.models import Hour
 
 from .models import Patient, Appointment
 from .serializers import *
+
 
 class IsPatient(BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.groups.filter(name='patient').exists())
         
+
+
+# --- patient registration ---
 
 @api_view(['POST'])
 def register_patient(request, format=None):
@@ -52,6 +58,9 @@ def register_patient(request, format=None):
         return Response({'message': patientSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'message': userSerializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
 
+
+
+# --- patient profile ---
 
 @api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsPatient])
@@ -87,23 +96,95 @@ def patient_profile(request, format=None):
         return Response({'profile_data':profileSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AppointementViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsPatient]
-    
-    def get_serializer_class(self):
-        if self.action == 'create' or self.action == 'partial_update' or self.action == 'update':
-            return AppointmentSerializer
-        else:
-            return AppointmentListSerializer
-    
-    def get_queryset(self):
-        patient = Patient.objects.get(user=self.request.user)
-        appointments = Appointment.objects.filter(patient=patient)
-        return appointments   
 
-    def perform_create(self, serializer):
-        patient = Patient.objects.get(user=self.request.user)
-        serializer.save(patient=patient, room=patient.id)  
+# --- timetable ---
+
+@api_view(['GET'])
+def get_free_time(request, date, doctor):
+    appointments = Appointment.objects.filter(date=date, doctor=doctor).values_list('time')
+
+    times = Hour.objects.all().exclude(time__in=appointments)
+    serializers = FreeTimesSerializer(times, many=True)
+
+    return Response(serializers.data)
+
+
+
+# --- appointments ---
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsPatient])
+def appointment_list(request):
+    patient = Patient.objects.get(pk=request.user.id)
+
+    if request.method == 'GET':
+        appointment = Appointment.objects.filter(patient=patient)
+        serializer = AppointmentListSerializer(appointment, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        serializer = AppointmentSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(patient=patient)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+@permission_classes([IsPatient])
+def appointment_detail(request, pk, format=None):
+
+    try:
+        appointment = Appointment.objects.get(pk=pk)
+    except Appointment.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+  
+    if request.method == 'GET':
+        serializer = AppointmentListSerializer(appointment)
+        return Response(serializer.data)
+
+
+    elif request.method == 'PUT':
+        serializer = AppointmentSerializer(instance=appointment, data=request.data)
+  
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    elif request.method == 'PATCH':
+        serializer = AppointmentSerializer(instance=appointment, data=request.data, partial=True)
+  
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  
+    elif request.method == 'DELETE':
+        appointment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+# class AppointementViewSet(viewsets.ModelViewSet):
+#     permission_classes = [IsPatient]
+    
+#     def get_serializer_class(self):
+#         if self.action == 'create' or self.action == 'partial_update' or self.action == 'update':
+#             return AppointmentSerializer
+#         else:
+#             return AppointmentListSerializer
+    
+#     def get_queryset(self):
+#         patient = Patient.objects.get(user=self.request.user)
+#         appointments = Appointment.objects.filter(patient=patient)
+#         return appointments   
+
+#     def perform_create(self, serializer):
+#         patient = Patient.objects.get(user=self.request.user)
+#         serializer.save(patient=patient, room=patient.id)  
 
 
 @api_view(['GET'])
