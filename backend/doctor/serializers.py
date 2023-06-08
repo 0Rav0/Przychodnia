@@ -99,7 +99,7 @@ class PatientAppointmentSerializer(serializers.ModelSerializer):
     reason = serializers.CharField(read_only=True)
     date = serializers.DateField(read_only=True)
     time = serializers.TimeField(read_only=True)
-    room = serializers.IntegerField(read_only=True)
+    # room = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Appointment

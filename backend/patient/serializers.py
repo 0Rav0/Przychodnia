@@ -65,11 +65,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class PatientProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
-        fields = ('first_name', 'last_name', 'pesel', 'phone_number',)
+        exclude = ('id','user',)
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = serializers.RelatedField(read_only=True)
 
     class Meta:
         model = Patient
@@ -84,7 +84,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ( 'id', 'date', 'time', 'doctor', 'status', 'reason',)
+        fields = ( 'id', 'date', 'time', 'doctor', 'status', 'reason', 'room')
 
 
 class AppointmentDetailSerializer(serializers.ModelSerializer):

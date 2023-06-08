@@ -121,14 +121,15 @@ def appointment_list(request):
 
     if request.method == 'GET':
         appointment = Appointment.objects.filter(patient=patient)
-        serializer = AppointmentDetailSerializer(appointment, many=True)
+        serializer = AppointmentSerializer(appointment, many=True)
         return Response(serializer.data)
     
     elif request.method == 'POST':
+        room = Doctor.objects.get(pk=request.data.get('doctor')).room
         serializer = AppointmentSerializer(data=request.data)
-
+        
         if serializer.is_valid():
-            serializer.save(patient=patient)
+            serializer.save(patient=patient, room=room)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

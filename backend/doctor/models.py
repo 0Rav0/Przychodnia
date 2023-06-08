@@ -22,6 +22,7 @@ class Doctor(models.Model):
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=9)
     specialization = models.CharField(max_length=50)
+    room = models.IntegerField(default=0)
     working_days = models.ManyToManyField(Day, blank=True)
     working_hours = models.ManyToManyField(Hour, blank=True)
 

@@ -9,6 +9,9 @@ class Patient(models.Model):
     last_name = models.CharField(max_length=50)
     pesel = models.CharField(max_length=11)
     phone_number = models.CharField(max_length=9)
+    medications = models.TextField(blank=True)
+    allergies = models.TextField(blank=True)
+    
 
     @property
     def get_name(self):
