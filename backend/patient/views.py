@@ -6,6 +6,8 @@ from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
+from django.core import mail
+from django.utils.html import strip_tags
 # from rest_framework_simplejwt.tokens import RefreshToken
 import json
 # import jwt
@@ -130,7 +132,24 @@ def appointment_list(request):
         serializer = AppointmentSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save(patient=patient, room=room)
+            details = serializer.save(patient=patient, room=room)
+
+            subject = 'Potwierdzenie utworzenia wizyty'
+            html_message = '<h1>Witaj '+patient.get_name+'</h1> \n \
+                <h2>Twoja wizyta została utworzona i czeka na zatwierdzenie! </h2>\n \
+                <h3><b>Szczegóły wizyty: </b> </h3> \n \
+                data: <b>'+ str(details.date) + ' ' + str(details.time) + '</b> <br /> \
+                lekarz: <b> dr '+ str(details.doctor) + ' (' + str(details.doctor.specialization) +')</b> <br /> \n \
+                cel/przyczyna: <b>'+ str(details.reason) + '</b> <br /> \n \
+                numer pokoju: <b>' + str(details.room) + '</b> <br /> \n '
+
+            plain_message = strip_tags(html_message)
+
+            from_email = 'From <przychodniastudencka10@gmail.com>'
+            to = request.user.email
+
+            mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -145,7 +164,7 @@ def appointment_detail(request, pk, format=None):
     except Appointment.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
   
-  
+
     if request.method == 'GET':
         serializer = AppointmentDetailSerializer(appointment)
         return Response(serializer.data)
