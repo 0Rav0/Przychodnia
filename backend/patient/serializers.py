@@ -78,8 +78,10 @@ class PatientProfileSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     # patient = serializers.StringRelatedField()
+    prescription = serializers.CharField(read_only=True)
+    recommendations = serializers.CharField(read_only=True)
     doctor = serializers.PrimaryKeyRelatedField(many=False, queryset=Doctor.objects.all())
-    # room = serializers.IntegerField(read_only=True)
+    room = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Appointment
