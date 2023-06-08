@@ -15,6 +15,9 @@ class IsDoctor(BasePermission):
         return bool(request.user and request.user.groups.filter(name='doctor').exists())
 
 
+
+# --- doctor lists and id for appointments ---
+
 @api_view(['GET'])
 def doctor_list(request):
     doctor = Doctor.objects.all()
@@ -32,6 +35,9 @@ def doctor_detail(request, pk):
     serializer = DoctorDetailSerializer(doctor, many=False)
     return Response(serializer.data)
 
+
+
+# --- doctor profile ---
 
 @api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsDoctor])
@@ -69,6 +75,18 @@ def doctor_profile(request, format=None):
         return Response({'profile_data':profileSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# -- appointments ---
+
+@api_view(['GET'])
+def get_doctor_appointments_for_day(request, date, doctor):
+    appointments = Appointment.objects.filter(date=date, doctor=doctor)
+
+    serializer = AppointmentSerializer(appointments, many=True)
+
+    return Response(serializer.data)
+
+
 class AppointementViewSet(viewsets.ModelViewSet):
     permission_classes = [IsDoctor]
     serializer_class = AppointmentSerializer
@@ -81,7 +99,7 @@ class AppointementViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['GET'])
-@permission_classes([IsDoctor])
+# @permission_classes([IsDoctor])
 def get_appointment_patient_detail(request, pk):
     user = request.user
     doctor = Doctor.objects.get(user=user)
