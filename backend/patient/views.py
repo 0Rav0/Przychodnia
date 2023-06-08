@@ -31,14 +31,10 @@ def register_patient(request, format=None):
     userSerializer = UserCreateSerializer(data=request.data)
 
     if userSerializer.is_valid():
-        user = userSerializer.save()
-
-        data = request.data.copy()
-        data['user'] = user
-
-        patientSerializer = PatientSerializer(data=data)
+        patientSerializer = PatientProfileSerializer(data=request.data)
 
         if patientSerializer.is_valid():
+            user = userSerializer.save()
             patientSerializer.save(user=user)
 
             # token = RefreshToken.for_user(user).access_token
@@ -125,7 +121,12 @@ def appointment_list(request):
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        room = Doctor.objects.get(pk=request.data.get('doctor')).room
+        try:
+            doctor = Doctor.objects.get(pk=request.data.get('doctor'))
+        except Doctor.DoesNotExist:
+            return Response({"message":"Taki lekarz nie istnieje"}, status=status.HTTP_400_BAD_REQUEST)
+
+        room = doctor.room
         serializer = AppointmentSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -137,11 +138,13 @@ def appointment_list(request):
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 @permission_classes([IsPatient])
 def appointment_detail(request, pk, format=None):
+    patient = Patient.objects.get(user=request.user)
 
     try:
-        appointment = Appointment.objects.get(pk=pk)
+        appointment = Appointment.objects.get(pk=pk, patient=patient)
     except Appointment.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+  
   
     if request.method == 'GET':
         serializer = AppointmentDetailSerializer(appointment)
@@ -158,10 +161,15 @@ def appointment_detail(request, pk, format=None):
     
 
     elif request.method == 'PATCH':
+        try:
+            room = Doctor.objects.get(pk=request.data.get('doctor')).room
+        except Doctor.DoesNotExist:
+            return Response({"message":"Taki lekarz nie istnieje"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = AppointmentSerializer(instance=appointment, data=request.data, partial=True)
   
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(room=room)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   

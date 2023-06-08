@@ -60,11 +60,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class DoctorSerializer(serializers.ModelSerializer):
-    # user = serializers.StringRelatedField()
+    user = serializers.RelatedField(read_only=True)
 
     class Meta:
         model = Doctor
-        fields = ('id', 'first_name', 'last_name', 'specialization',)
+        fields = '__all__'
 
 
 class DoctorDetailSerializer(serializers.ModelSerializer):

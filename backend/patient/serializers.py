@@ -62,19 +62,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PatientProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Patient
-        exclude = ('id','user',)
-
-
 class PatientSerializer(serializers.ModelSerializer):
     user = serializers.RelatedField(read_only=True)
 
     class Meta:
         model = Patient
-        # fields = '__all__'
-        exclude = ('id',)
+        fields = '__all__'
+
+
+class PatientProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Patient
+        exclude = ('id','user',)
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
